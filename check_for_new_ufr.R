@@ -5,9 +5,6 @@
 # Load relevant libraries
 library(rvest)
 
-# Read current list of ufr articles from csv file
-links <- read.csv(file="ufr_urls.csv",header=FALSE,stringsAsFactors = FALSE)[[1]]
-
 # Get the urls for recently tagged mgoblog articles
 ufr_html  <- read_html("http://mgoblog.com/category/post-type/upon-further-review")
 new_links <- ufr_html %>% html_nodes("a") %>% xml_attr("href")

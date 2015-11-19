@@ -7,9 +7,6 @@
 new_links <- new_links[are_new_links]
 links     <- c(links,new_links)
 
-# Add new urls to csv file
-write.table(new_links,file="ufr_urls.csv",append = TRUE,sep=",",col.names = FALSE,row.names = FALSE)
-
 #################################
 # Initialize relevant parameters
 o_position <- c("OL","RB","WR","TM")
