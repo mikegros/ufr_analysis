@@ -14,6 +14,8 @@ condition1 <- '!(input.o_or_d == "offense" && input.o_type == "table")'
 condition2 <- '!(input.o_or_d == "defense" && input.d_type == "table")'
 condition3 <- '!(input.o_or_d == "offense" && input.o_type == "two_players")'
 condition4 <- '!(input.o_or_d == "defense" && input.d_type == "two_players")'
+condition5 <- '!(input.o_or_d == "offense" && input.o_type == "top10")'
+condition6 <- '!(input.o_or_d == "defense" && input.d_type == "top10")'
 
 
 shinyUI(fluidPage(
@@ -92,15 +94,15 @@ shinyUI(fluidPage(
                           
                  ),
                  
-#                  tabPanel("Top/Bottom 10", value = "top10",
-#                           flowLayout(
-#                             selectInput("top10_o_pos","Position",
-#                                         c("OL","RB","WR")),
-#                             selectInput("top10_o_type","Type",
-#                                         c("career","season","game"))
-#                           )
-#                           
-#                  ),
+                 tabPanel("Top/Bottom 10", value = "top10",
+                          flowLayout(
+                            selectInput("top10_o_pos","Position",
+                                        c("OL","RB","WR")),
+                            selectInput("top10_o_type","Type",
+                                        c("career","season","game"))
+                          )
+                          
+                 ),
                  
                  tabPanel("Sortable Table", value = "table",
                           flowLayout(
@@ -182,15 +184,15 @@ shinyUI(fluidPage(
                           
                  ),
                  
-#                  tabPanel("Top/Bottom 10", value = "top10",
-#                           flowLayout(
-#                             selectInput("top10_d_pos","Position",
-#                                         c("DL","LB","DB")),
-#                             selectInput("top10_d_type","Type",
-#                                         c("career","season","game"))
-#                           )
-#                           
-#                  ),
+                 tabPanel("Top/Bottom 10", value = "top10",
+                          flowLayout(
+                            selectInput("top10_d_pos","Position",
+                                        c("DL","LB","DB")),
+                            selectInput("top10_d_type","Type",
+                                        c("career","season","game"))
+                          )
+                          
+                 ),
                  
                  tabPanel("Sortable Table", value = "table",
                           flowLayout(
@@ -207,13 +209,13 @@ shinyUI(fluidPage(
     )
   ),
   
-  conditionalPanel(paste(condition1,condition2,sep=" && "),
+  conditionalPanel(paste(condition1,condition2,condition5,condition6,sep=" && "),
                             fluidRow(plotOutput("player_plot"))
   ),
-  conditionalPanel(paste(condition1,condition2,condition3,condition4,sep=" && "),
+  conditionalPanel(paste(condition1,condition2,condition3,condition4,condition5,condition6,sep=" && "),
                    fluidRow(plotOutput("player_plot_single2"))
   ),
-  conditionalPanel(paste(condition1,condition2,condition3,condition4,sep=" && "),
+  conditionalPanel(paste(condition1,condition2,condition3,condition4,condition5,condition6,sep=" && "),
                    fluidRow(plotOutput("player_plot_single3"))
   ),
   conditionalPanel('input.o_or_d == "offense" && input.o_type == "table"',
@@ -221,18 +223,18 @@ shinyUI(fluidPage(
   ),
   conditionalPanel('input.o_or_d == "defense" && input.d_type == "table"',
                    fluidRow(dataTableOutput("data_table_D"))
-#   ),
-#   conditionalPanel('input.o_or_d == "offense" && input.o_type == "top10"',
-#                    flowLayout(
-#                      textOutput("top10_O"),
-#                      textOutput("bottom10_O")
-#                      )
-#   ),
-#   conditionalPanel('input.o_or_d == "defense" && input.d_type == "top10"',
-#                    flowLayout(
-#                      textOutput("top10_D"),
-#                      textOutput("bottom10_D")
-#                    )
+  ),
+  conditionalPanel('input.o_or_d == "offense" && input.o_type == "top10"',
+                   fluidRow(
+                     verbatimTextOutput("top10_O"),
+                     verbatimTextOutput("bottom10_O")
+                     )
+  ),
+  conditionalPanel('input.o_or_d == "defense" && input.d_type == "top10"',
+                   fluidRow(
+                     verbatimTextOutput("top10_D"),
+                     verbatimTextOutput("bottom10_D")
+                   )
   )
   
 ))

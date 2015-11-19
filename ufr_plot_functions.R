@@ -185,11 +185,11 @@ summary_position <- function(pos,db){
 
 topN_position <- function(pos,n,db,type="career",bottom=FALSE){
   sub_db <- subset(db,position==pos & name != "TOTAL")
+  title_str <- ifelse(bottom,"bottom","top")
   if (type=="game"){
-    
     ordered_inds <- order(sub_db$total,decreasing = !bottom)
     tmp <- sub_db[ordered_inds[1:n],]
-    cat("The ", type," top ", n," ", pos," are: \n",sep="")
+    cat("The ", type," ",title_str," ", n," ", pos," are: \n",sep="")
     for (i in 1:n) cat(i, ") ",tmp$name[i]," with ",tmp$total[i]," in ", tmp$year[i]," against ",tmp$opponent[i],"\n",sep="")
     
   } else if (type=="season"){
@@ -197,7 +197,7 @@ topN_position <- function(pos,n,db,type="career",bottom=FALSE){
     tmp_season <- aggregate(total~name+year,subset(sub_db,position != "TM"),sum)
     ordered_inds <- order(tmp_season$total,decreasing = !bottom)
     tmp <- tmp_season[ordered_inds[1:n],]
-    cat("The ", type," top ", n," ", pos," are: \n",sep="")
+    cat("The ", type," ",title_str," ", n," ", pos," are: \n",sep="")
     for (i in 1:n) cat(i, ") ",tmp$name[i]," with ",tmp$total[i]," in ", tmp$year[i],"\n",sep="")
     
   } else if (type=="career"){
@@ -205,7 +205,7 @@ topN_position <- function(pos,n,db,type="career",bottom=FALSE){
     tmp_career <- aggregate(total~name,subset(sub_db,position != "TM"),sum)
     ordered_inds <- order(tmp_career$total,decreasing = !bottom)
     tmp <- tmp_career[ordered_inds[1:n],]
-    cat("The ", type," top ", n," ", pos," are: \n",sep="")
+    cat("The ", type," ",title_str," ", n," ", pos," are: \n",sep="")
     for (i in 1:n) cat(i, ") ",tmp$name[i]," with ",tmp$total[i],"\n",sep = "")
     
   }

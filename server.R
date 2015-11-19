@@ -110,23 +110,23 @@ shinyServer(function(input, output) {
   }, options = list(lengthMenu = c(5, 10, 25), pageLength = 10)
   )
   
-#   output$top10_O <- renderPrint({
-#     topN_position(input$top10_o_pos,10,ufr_O_db,type = input$top10_o_type)
-#   }
-#   )
-#   
-#   output$top10_D <- renderPrint({
-#     topN_position(input$top10_d_pos,10,ufr_D_db,type = input$top10_d_type)
-#   }
-#   )
-#   
-#   output$bottom10_O <- renderText({
-#     topN_position(input$top10_o_pos,10,ufr_O_db,type = input$top10_o_type, bottom = TRUE)
-#   }
-#   )
-#   
-#   output$bottom10_D <- renderText({
-#     topN_position(input$top10_d_pos,10,ufr_D_db,type = input$top10_d_type, bottom = TRUE)
-#   }
-#   )
+  output$top10_O    <- renderPrint({
+    topN_position(input$top10_o_pos,10,ufr_O_db,type = input$top10_o_type)
+  }
+  )
+  
+  output$top10_D    <- renderPrint({
+    topN_position(input$top10_d_pos,10,ufr_D_db,type = input$top10_d_type)
+  }
+  )
+  
+  output$bottom10_O <- renderPrint({
+    topN_position(input$top10_o_pos,10,ufr_O_db,type = input$top10_o_type, bottom = TRUE)
+  }
+  )
+  
+  output$bottom10_D <- renderPrint({
+    topN_position(input$top10_d_pos,10,ufr_D_db,type = input$top10_d_type, bottom = TRUE)
+  }
+  )
 })
