@@ -7,15 +7,6 @@
 
 library(shiny)
 
-# Get latest ufr_data file from my umich webspace
-#     Should move that elsewhere for more general access. Alternative is
-#     to have the app check for any new UFR posts each time it loads and scrape down
-#     new data if a new UFR exists. Would be easy to implement but not sure if that is 
-#     the better choice as it means it would scrape the recent UFR posts from MGoBlog 
-#     whenever anyone used the app, which is (a tiny bit) of unnecessary bandwidth usage
-#     for them  (instead of a bit of tiny bandwidth usage for umich.edu I guess)
-
-load(file="ufr_data.RData")
 source("./ufr_plot_functions.R")
 
 plot_select <- function(input,num){
@@ -25,7 +16,7 @@ plot_select <- function(input,num){
     db <- ufr_O_db
     if (input$o_type=="position"){
       
-      if (input$o_agg_pos)    db <- aggregate(cbind(total,plus,minus) ~ year+position+name,db,mean)
+      if (input$o_agg_pos) db <- aggregate(cbind(total,plus,minus) ~ year+position+name,db,mean)
       position_plus_minus_single(input$o_pos,db,num)
       
     } else if (input$o_type=="player"){
@@ -53,7 +44,7 @@ plot_select <- function(input,num){
     
   } else {
     
-    db         <- ufr_D_db
+    db <- ufr_D_db
     if (input$d_type=="position"){
       
       if (input$d_agg_pos) db <- aggregate(cbind(total,plus,minus) ~ year+position+name,db,mean)

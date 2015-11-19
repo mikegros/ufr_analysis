@@ -1,36 +1,37 @@
-# File for building UFR Database
+#
+# File for acquiring new data for the UFR Database
+#
+# Sourced from check_for_new_ufr.R
+#
 
-# Load relevant libraries
-library(rvest)
-
-#################################
-# Get the urls for the existing UFRs
-
-ufr_html  <- read_html("http://mgoblog.com/category/post-type/upon-further-review")
-new_links <- ufr_html %>% html_nodes("a") %>% xml_attr("href")
-new_links <- new_links[grepl("upon-further-review-20",new_links)]
-new_links <- new_links[!grepl("#",new_links)]
-links     <- c(links,new_links[1])
+new_links <- new_links[are_new_links]
+links     <- c(links,new_links)
 
 # Add new urls to csv file
-write.table(new_links[1],file="ufr_urls.csv",append = TRUE,sep=",",col.names = FALSE)
+write.table(new_links,file="ufr_urls.csv",append = TRUE,sep=",",col.names = FALSE,row.names = FALSE)
 
 #################################
 # Initialize relevant parameters
 o_position <- c("OL","RB","WR","TM")
 d_position <- c("DL","LB","DB","TM")
 
-for (i in (length(links)):length(links)) {
-  opp  <- strsplit(links[i],split = "-vs-")[[1]][2]
-  year <- as.numeric(strsplit(links[i],split = "-")[[1]][4])
+for (i in (1:length(new_links))) {
+  # Obtain opponent name and year from the url
+  opp  <- strsplit(new_links[i],split = "-vs-")[[1]][2]
+  year <- as.numeric(strsplit(new_links[i],split = "-")[[1]][4])
   
-  if(grepl("defense",links[i])){
+  if(grepl("defense",new_links[i])){
     
     ###################
     # DEFENSE 
     
-    ufr_html <- read_html(paste("http://mgoblog.com",links[i],sep=""))
+    ufr_html <- read_html(paste("http://mgoblog.com",new_links[i],sep=""))
     
+    # Find the CHART by looking for the table that 
+    #     starts with the first entry Defensive Line
+    #
+    # Start with second table because first is the large listing of plays
+    #
     ii <- 2
     ufr_D <- ufr_html %>% 
       html_nodes("table") %>% 
@@ -54,6 +55,7 @@ for (i in (length(links)):length(links)) {
                   which(ufr_D[,1]=="Secondary"),
                   which(ufr_D[,1]=="Metrics"))
     
+    # Extract data from chart for each position group
     for (ii in 1:3){
       tmp <- ufr_D[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:4]
       tmp[,2:4] <- sapply(tmp[,2:4],as.numeric)
@@ -66,7 +68,7 @@ for (i in (length(links)):length(links)) {
       ufr_D_db[new_inds,] <- tmp
     }
     
-    # Get Team Metrics
+    # and extract data for Team Metrics
     tmp <- ufr_D[(ref_inds[4]+1):nrow(ufr_D),1:4]
     tmp[,2:4] <- sapply(tmp[,2:4],as.numeric)
     tmp[,2:4] <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
@@ -82,11 +84,17 @@ for (i in (length(links)):length(links)) {
     ####################
     # OFFENSE
     
-    ufr_html <- read_html(paste("http://mgoblog.com",links[i],sep=""))
+    ufr_html <- read_html(paste("http://mgoblog.com",new_links[i],sep=""))
     
     ufr_tables <- ufr_html %>% 
       html_nodes("table")
     
+    # Find the CHART by looking for the table that 
+    #     starts with the first entry Offensive Line
+    #
+    # Also finds the HenneChart and the WR catch chart
+    #     but currently does nothing with them
+    #
     for (ii in 2:length(ufr_tables)){
       tmp <- ufr_tables[[ii]] %>% 
         html_table(fill=TRUE,header=FALSE)
@@ -102,6 +110,7 @@ for (i in (length(links)):length(links)) {
                   which(ufr_oline[,1]=="Receivers" | ufr_oline[,1]=="Receiver"),
                   which(ufr_oline[,1]=="Metrics"))
     
+    # Extract data from chart for each position group
     for (ii in 1:3){
       tmp <- ufr_oline[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:4]
       tmp[,2:4] <- sapply(tmp[,2:4],as.numeric)
@@ -114,7 +123,7 @@ for (i in (length(links)):length(links)) {
       ufr_O_db[new_inds,] <- tmp
     }
     
-    # Get Team Metrics
+    # and for team metrics
     tmp <- ufr_oline[(ref_inds[4]+2):nrow(ufr_oline),1:4]
     tmp[,2:4] <- sapply(tmp[,2:4],as.numeric)
     tmp[,2:4] <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
@@ -227,4 +236,4 @@ ufr_O_db$position[ufr_O_db$name=="Oluigbo"] <- "RB"
 ufr_O_db$total <- ufr_O_db$plus - ufr_O_db$minus
 ufr_D_db$total <- ufr_D_db$plus - ufr_D_db$minus
 
-# save(ufr_D_db,ufr_O_db,links,file="ufr_data.RData")
+save(ufr_D_db,ufr_O_db,links,file="ufr_data.RData")

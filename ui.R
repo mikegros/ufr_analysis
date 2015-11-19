@@ -7,8 +7,15 @@
 
 library(shiny)
 
-download.file("http://www-personal.umich.edu/~mikegros/ufr_data.RData",destfile = "ufr_data.RData")
+#
+# Check for new UFR data and if so, scrape it and add it to the database
+#     would prefer it not HAVE to check every time, but for now this seems
+#     like the best option for maintaining up-to-date data without 
+#     manual updating. Will be a problem if noone checks for a long stretch
+#     of UFR writeups
+#
 load(file="./ufr_data.RData")
+source("check_for_new_ufr.R")
 
 condition1 <- '!(input.o_or_d == "offense" && input.o_type == "table")'
 condition2 <- '!(input.o_or_d == "defense" && input.d_type == "table")'

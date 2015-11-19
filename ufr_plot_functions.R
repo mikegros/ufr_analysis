@@ -1,10 +1,16 @@
 ############################################
-# Script to simply play with plots
+# Scripts to make plots and tables
 #     for exploration sake
 
 player_plus_minus <- function(player,db){
-  ####
+  #
   # Function for individual player plots
+  #    looking at their +/-
+  #
+  # Makes a three panel plot
+  #
+  # Obsolete for shiny but useful for local plots
+  #
   maize_and_blue <- c("#00274C","#FFCB05")
   palette(maize_and_blue)
   
@@ -16,6 +22,8 @@ player_plus_minus <- function(player,db){
   layout(matrix(c(1,3,2,4),2,2))
   par(mar=c(8,4,2,2))
   par(bg=rgb(0.95,0.95,0.95,1.0))
+  
+  # Empty plot region for player name
   plot(0:1,0:1,type="n",axes = F,xlab="",ylab="")
   text(0.5,0.5,player,cex=2)
   
@@ -53,8 +61,10 @@ player_plus_minus <- function(player,db){
 }
 
 compare_players <- function(player1,player2,db){
-  ####
-  # Function for individual player plots
+  #
+  # Function for comparing pairs of players
+  #     on the same scale
+  #
   maize_and_blue <- c("#00274C","#FFCB05")
   palette(maize_and_blue)
   
@@ -93,8 +103,14 @@ compare_players <- function(player1,player2,db){
 }
 
 position_plus_minus <- function(pos,db){
-  ####
-  # Function for individual player plots
+  #
+  # Function for position group plots
+  #    looking at their +/-
+  #
+  # Makes a three panel plot
+  #
+  # Obsolete for shiny but useful for local plots
+  #
   maize_and_blue <- c("#00274C","#FFCB05")
   palette(maize_and_blue)
   
@@ -142,10 +158,13 @@ position_plus_minus <- function(pos,db){
   invisible()
 }
 
-###########################
-# Function for finding best and worst at a position
-
 summary_position <- function(pos,db){
+  #
+  # Function for looking at some general summaries of 
+  #     about a position group
+  #
+  # Not used in shiny. For local exploration
+  # 
   sub_db <- subset(db,position==pos & name != "TOTAL")
   cat("Mean total for ",pos," is: ",mean(sub_db$total),"\n")
   cat("Mean number of + for ",pos," is: ",mean(sub_db$plus),"\n")
@@ -180,10 +199,25 @@ summary_position <- function(pos,db){
   invisible()
 }
 
-###########################
-# Top N at a position by totals
-
 topN_position <- function(pos,n,db,type="career",bottom=FALSE){
+  #
+  # Prints a list of the top N by position group for either 
+  #     career, single season, or single game
+  # 
+  # Can also list bottom N instead
+  #
+  # Used in the Shiny app
+  #
+  # Inputs:
+  #     pos    = string, listing the position group (OL,RB,WR,DL,LB,DB)
+  #     n      = scalar, length of list to print
+  #     db     = data frame, with the UFR database
+  #     type   = string, either career, season, or game
+  #     bottom = logical, flips the list from top N to bottom N
+  #
+  # Effect:
+  #     Prints out a list of the top or bottom N in R
+  #
   sub_db <- subset(db,position==pos & name != "TOTAL")
   title_str <- ifelse(bottom,"bottom","top")
   if (type=="game"){
@@ -213,6 +247,14 @@ topN_position <- function(pos,n,db,type="career",bottom=FALSE){
 }
 
 topN_df <- function(pos,n,db,type="career",bottom=FALSE){
+  #
+  # Returns a data frame of the top N by position group for 
+  #     either career, single season, or single game
+  # 
+  # Can also list bottom N instead
+  #
+  # Obsolete! Not used in Shiny
+  #
   sub_db <- subset(db,position==pos & name != "TOTAL")
   if (type=="game"){
     
@@ -236,6 +278,20 @@ topN_df <- function(pos,n,db,type="career",bottom=FALSE){
 }
 
 aggregate_df <- function(pos,db,type="career"){
+  #
+  # Returns a data frame of the raw data by position group 
+  #     aggregated to either career, single season, or single game
+  # 
+  # Used in the Shiny app for Sortable Table
+  #
+  # Inputs:
+  #     pos    = string, listing the position group (OL,RB,WR,DL,LB,DB)
+  #     db     = data frame, with the UFR database
+  #     type   = string, either career, season, or game
+  #
+  # Effect:
+  #     Returns a data frame aggregated for building the Sortable Table
+  #
   sub_db <- subset(db,position==pos & name != "TOTAL")
   if (type=="game"){
     
@@ -254,12 +310,26 @@ aggregate_df <- function(pos,db,type="career"){
 }
 
 
-#########################################################
-# Functions specifically for Shiny app
-#
 position_plus_minus_single <- function(pos,db,num){
-  ####
-  # Function for individual player plots
+  #
+  # Function for position group plots
+  #    looking at their +/-
+  # 
+  # Same as earlier but makes the individual plots
+  #    instead of 3-panel. Looks better rendered on
+  #    web so moved from the previous to this
+  #
+  # Used in the Shiny app
+  #
+  # Inputs:
+  #     pos    = string, listing the position group (OL,RB,WR,DL,LB,DB)
+  #     db     = data frame, with the UFR database
+  #     num    = scalar, which panel of the plot above to make
+  #                (1=Total,2=Plus,3=Minus) - should change it to receive string
+  #
+  # Effect:
+  #     Plots the designated position group over time
+  #
   maize_and_blue <- c("#00274C","#FFCB05")
   palette(maize_and_blue)
   
@@ -313,8 +383,25 @@ position_plus_minus_single <- function(pos,db,num){
 }
 
 player_plus_minus_single <- function(player,db,num=1){
-  ####
+  #
   # Function for individual player plots
+  #    looking at their +/-
+  # 
+  # Same as earlier but makes the individual plots
+  #    instead of 3-panel. Looks better rendered on
+  #    web so moved from the previous to this
+  #
+  # Used in the Shiny app
+  #
+  # Inputs:
+  #     player = string, listing the players name
+  #     db     = data frame, with the UFR database
+  #     num    = scalar, which panel of the plot above to make
+  #                (1=Total,2=Plus,3=Minus) - should change it to receive string
+  #
+  # Effect:
+  #     Plots the designated player over time
+  #
   maize_and_blue <- c("#00274C","#FFCB05")
   palette(maize_and_blue)
   
