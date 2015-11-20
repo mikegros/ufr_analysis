@@ -17,6 +17,11 @@ library(shiny)
 load(file="./ufr_data.RData")
 source("check_for_new_ufr.R")
 
+
+# Conditions for hiding the plot panels from the UI. There is almost 
+#     certainly a better way to do this but for now it's necessary to
+#     properly hide/show plots because of the nested menus
+
 condition1 <- '!(input.o_or_d == "offense" && input.o_type == "table")'
 condition2 <- '!(input.o_or_d == "defense" && input.d_type == "table")'
 condition3 <- '!(input.o_or_d == "offense" && input.o_type == "two_players")'
@@ -29,7 +34,7 @@ shinyUI(fluidPage(
   headerPanel("MGoBlog Upon Further Review (UFR) Visualization"),
   br(),
   
-  # Application title
+  # Set up nested navPanels
   fluidRow(
     navlistPanel(
       tabPanel("Offense", value = "offense",
