@@ -7,6 +7,7 @@
 
 library(shiny)
 
+load(file="./ufr_data.RData")
 source("./ufr_plot_functions.R")
 
 plot_select <- function(input,num){

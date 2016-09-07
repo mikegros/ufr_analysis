@@ -15,7 +15,8 @@ d_position <- c("DL","LB","DB","TM")
 for (i in (1:length(new_links))) {
   # Obtain opponent name and year from the url
   opp  <- strsplit(new_links[i],split = "-vs-")[[1]][2]
-  year <- as.numeric(strsplit(new_links[i],split = "-")[[1]][4])
+  year <- strsplit(new_links[i],split = "-")[[1]]
+  year <- as.numeric(year[grep("20",year)])
   
   if(grepl("defense",new_links[i])){
     
