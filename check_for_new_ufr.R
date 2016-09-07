@@ -17,7 +17,8 @@ new_links <- new_links[!grepl("#",new_links)]
 new_links <- new_links[length(new_links):1]
 
 # Check to see if any links are new
+print(ls())
+print(tail(ufr_D_db$total))
 are_new_links <- !sapply(new_links,function(x,y){x %in% y},y=links)
-
 # If any of the links are new, update the UFR databases
 if(any(are_new_links)) source("ufr_acquire_new.R")

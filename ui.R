@@ -7,17 +7,6 @@
 
 library(shiny)
 
-#
-# Check for new UFR data and if so, scrape it and add it to the database
-#     would prefer it not HAVE to check every time, but for now this seems
-#     like the best option for maintaining up-to-date data without 
-#     manual updating. Will be a problem if noone checks for a long stretch
-#     of UFR writeups
-#
-load(file="./ufr_data.RData")
-source("check_for_new_ufr.R")
-
-
 # Conditions for hiding the plot panels from the UI. There is almost 
 #     certainly a better way to do this but for now it's necessary to
 #     properly hide/show plots because of the nested menus

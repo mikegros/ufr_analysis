@@ -7,8 +7,16 @@
 
 library(shiny)
 
-load(file="./ufr_data.RData")
-source("./ufr_plot_functions.R")
+#
+# Check for new UFR data and if so, scrape it and add it to the database
+#     would prefer it not HAVE to check every time, but for now this seems
+#     like the best option for maintaining up-to-date data without 
+#     manual updating. Will be a problem if noone checks for a long stretch
+#     of UFR writeups
+#
+source("check_for_new_ufr.R",local=TRUE)
+
+source("./ufr_plot_functions.R",local=TRUE)
 
 plot_select <- function(input,num){
   

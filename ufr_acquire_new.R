@@ -36,7 +36,7 @@ for (i in (1:length(new_links))) {
       .[[ii]] %>% 
       html_table(fill=TRUE,header=FALSE)
     
-    while(ufr_D[1,1] != "Defensive Line"){
+    while(ufr_D[1,1] != "DL"){
       ii = ii+1
       ufr_D <- ufr_html %>% 
         html_nodes("table") %>% 
@@ -48,33 +48,39 @@ for (i in (1:length(new_links))) {
       }
     }
     
-    ref_inds <- c(which(ufr_D[,1]=="Defensive Line"),
-                  which(ufr_D[,1]=="Linebacker"),
-                  which(ufr_D[,1]=="Secondary"),
+    ref_inds <- c(which(ufr_D[,1]=="DL"),
+                  which(ufr_D[,1]=="LB"),
+                  which(ufr_D[,1]=="DB"),
                   which(ufr_D[,1]=="Metrics"))
     
     # Extract data from chart for each position group
     for (ii in 1:3){
-      tmp <- ufr_D[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:4]
-      tmp[,2:4] <- sapply(tmp[,2:4],as.numeric)
-      tmp[,2:4] <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
-      tmp$position <- d_position[ii]
-      tmp$opponent <- opp
-      tmp$year <- year
-      new_inds <- (nrow(ufr_D_db)+1):(nrow(ufr_D_db)+nrow(tmp))
+      tmp           <- ufr_D[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:5]
+      tmp[,2:5]     <- sapply(tmp[,2:5],as.numeric)
+      tmp[,2:5]     <- sapply(tmp[,2:5],function(x){x[is.na(x)] <- 0;return(x)})
+      tmp$position  <- d_position[ii]
+      tmp$opponent  <- opp
+      tmp$year      <- year
+      tmp$snaps     <- tmp[, 2]
+      tmp           <- tmp[,-2]
+      new_inds      <- (nrow(ufr_D_db)+1):(nrow(ufr_D_db)+nrow(tmp))
       rownames(tmp) <- new_inds
+      
       ufr_D_db[new_inds,] <- tmp
     }
     
     # and extract data for Team Metrics
-    tmp <- ufr_D[(ref_inds[4]+1):nrow(ufr_D),1:4]
-    tmp[,2:4] <- sapply(tmp[,2:4],as.numeric)
-    tmp[,2:4] <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
-    tmp$position <- d_position[4]
-    tmp$opponent <- opp
-    tmp$year <- year
-    new_inds <- (nrow(ufr_D_db)+1):(nrow(ufr_D_db)+nrow(tmp))
+    tmp           <- ufr_D[(ref_inds[4]+1):nrow(ufr_D),1:5]
+    tmp[,3:5]     <- sapply(tmp[,3:5],as.numeric)
+    tmp[,3:5]     <- sapply(tmp[,3:5],function(x){x[is.na(x)] <- 0;return(x)})
+    tmp$position  <- d_position[4]
+    tmp$opponent  <- opp
+    tmp$year      <- year
+    tmp$snaps     <- NA
+    tmp           <- tmp[,-2]
+    new_inds      <- (nrow(ufr_D_db)+1):(nrow(ufr_D_db)+nrow(tmp))
     rownames(tmp) <- new_inds
+    
     ufr_D_db[new_inds,] <- tmp
     
   } else {
@@ -144,6 +150,7 @@ ufr_O_db$opponent[ufr_O_db$opponent=="michigan-state"] <- "msu"
 ufr_D_db$opponent[ufr_D_db$opponent=="michigan-state"] <- "msu"
 
 # Fix names or inconsistent name conventions
+ufr_D_db$name[ufr_D_db$name=="Hill" & ufr_D_db$year < 2016] <- "D. Hill"
 ufr_D_db$name[ufr_D_db$name=="C.Gordon"] <- "C. Gordon"
 ufr_D_db$name[ufr_D_db$name=="Holowell"] <- "Hollowell"
 ufr_D_db$name[ufr_D_db$name=="VanBergen"] <- "Van Bergen"
@@ -154,6 +161,7 @@ ufr_O_db$name[ufr_O_db$name=="JRobinson"] <- "J. Robinson"
 ufr_O_db$name[ufr_O_db$name=="Smith" & ufr_O_db$year < 2013] <- "V. Smith"
 ufr_O_db$name[ufr_O_db$name=="Smith" & ufr_O_db$year >= 2013] <- "D. Smith"
 ufr_D_db$name[ufr_D_db$name=="Clark" & ufr_D_db$position == "DB"] <- "J. Clark"
+ufr_D_db$name[ufr_D_db$name=="Clark" & ufr_D_db$year < 2015] <- "F. Clark"
 ufr_D_db$name[ufr_D_db$name=="RJS"] <- "Jenkins-Stone"
 ufr_D_db$name[ufr_D_db$name=="Graham" & ufr_D_db$year <  2007] <- "C. Graham"
 ufr_D_db$name[ufr_D_db$name=="Graham" & ufr_D_db$year >= 2007] <- "B. Graham"
@@ -162,7 +170,8 @@ ufr_D_db$name[ufr_D_db$name=="Taylor" & ufr_D_db$year >= 2010] <- "R. Taylor"
 ufr_D_db$name[ufr_D_db$name=="Johnson" & ufr_D_db$year <  2010] <- "W. Johnson"
 ufr_D_db$name[ufr_D_db$name=="Johnson" & ufr_D_db$year >= 2010] <- "C. Johnson"
 ufr_D_db$name[ufr_D_db$name=="Watson" & ufr_D_db$year <  2008] <- "G. Watson"
-ufr_D_db$name[ufr_D_db$name=="Watson" & ufr_D_db$year >= 2008] <- "S. Watson"
+ufr_D_db$name[ufr_D_db$name=="Watson" & ufr_D_db$year >= 2008 & ufr_D_db$year <= 2015] <- "S. Watson"
+ufr_D_db$name[ufr_D_db$name=="Watson" & ufr_D_db$year >= 2016] <- "B. Watson"
 ufr_O_db$name[ufr_O_db$name=="Cole" & ufr_O_db$position == "OL"] <- "M. Cole"
 ufr_O_db$name[ufr_O_db$name=="Cole" & ufr_O_db$position == "WR"] <- "B. Cole"
 
