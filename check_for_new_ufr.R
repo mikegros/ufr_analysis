@@ -19,4 +19,4 @@ new_links <- new_links[length(new_links):1]
 # Check to see if any links are new
 are_new_links <- !sapply(new_links,function(x,y){x %in% y},y=links)
 # If any of the links are new, update the UFR databases
-if(any(are_new_links)) source("ufr_acquire_new.R")
+if(any(are_new_links)) source("ufr_acquire_new.R",local=TRUE)
