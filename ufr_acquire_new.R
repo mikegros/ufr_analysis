@@ -17,8 +17,10 @@ for (i in (1:length(new_links))) {
   opp  <- strsplit(new_links[i],split = "-vs-")[[1]][2]
   year <- strsplit(new_links[i],split = "-")[[1]]
   year <- as.numeric(year[grep("20",year)])
-  
-  if(grepl("defense",new_links[i])){
+
+  if(grepl("special",new_links[i])){
+    
+  }else if(grepl("defense",new_links[i])){
     
     ###################
     # DEFENSE 
@@ -36,7 +38,7 @@ for (i in (1:length(new_links))) {
       .[[ii]] %>% 
       html_table(fill=TRUE,header=FALSE)
     
-    while(ufr_D[1,1] != "DL"){
+    while(ufr_D[1,1] != "DL" && ufr_D[1,1] != "Defensive Line"){
       ii = ii+1
       ufr_D <- ufr_html %>% 
         html_nodes("table") %>% 
@@ -48,21 +50,21 @@ for (i in (1:length(new_links))) {
       }
     }
     
-    ref_inds <- c(which(ufr_D[,1]=="DL"),
-                  which(ufr_D[,1]=="LB"),
-                  which(ufr_D[,1]=="DB"),
+    ref_inds <- c(which(ufr_D[,1]=="DL" | ufr_D[,1]=="Defensive Line"),
+                  which(ufr_D[,1]=="LB" | ufr_D[,1]=="Linebacker"),
+                  which(ufr_D[,1]=="DB" | ufr_D[,1]=="Secondary"),
                   which(ufr_D[,1]=="Metrics"))
     
     # Extract data from chart for each position group
     for (ii in 1:3){
-      tmp           <- ufr_D[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:5]
-      tmp[,2:5]     <- sapply(tmp[,2:5],as.numeric)
-      tmp[,2:5]     <- sapply(tmp[,2:5],function(x){x[is.na(x)] <- 0;return(x)})
+      tmp           <- ufr_D[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:4]
+      tmp[,2:4]     <- sapply(tmp[,2:4],as.numeric)
+      tmp[,2:4]     <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
       tmp$position  <- d_position[ii]
       tmp$opponent  <- opp
       tmp$year      <- year
-      tmp$snaps     <- tmp[, 2]
-      tmp           <- tmp[,-2]
+      tmp$snaps     <- NA
+      #tmp           <- tmp[,-2]
       new_inds      <- (nrow(ufr_D_db)+1):(nrow(ufr_D_db)+nrow(tmp))
       rownames(tmp) <- new_inds
       
@@ -70,14 +72,14 @@ for (i in (1:length(new_links))) {
     }
     
     # and extract data for Team Metrics
-    tmp           <- ufr_D[(ref_inds[4]+1):nrow(ufr_D),1:5]
-    tmp[,3:5]     <- sapply(tmp[,3:5],as.numeric)
-    tmp[,3:5]     <- sapply(tmp[,3:5],function(x){x[is.na(x)] <- 0;return(x)})
+    tmp           <- ufr_D[(ref_inds[4]+1):nrow(ufr_D),1:4]
+    tmp[,2:4]     <- sapply(tmp[,2:4],as.numeric)
+    tmp[,2:4]     <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
     tmp$position  <- d_position[4]
     tmp$opponent  <- opp
     tmp$year      <- year
     tmp$snaps     <- NA
-    tmp           <- tmp[,-2]
+    # tmp           <- tmp[,-2]
     new_inds      <- (nrow(ufr_D_db)+1):(nrow(ufr_D_db)+nrow(tmp))
     rownames(tmp) <- new_inds
     
@@ -94,43 +96,53 @@ for (i in (1:length(new_links))) {
       html_nodes("table")
     
     # Extract O-line data
+    one_table <- TRUE
     for (ii in 2:length(ufr_tables)){
       tmp <- ufr_tables[[ii]] %>% 
         html_table(fill=TRUE,header=FALSE)
       if(tmp[1,1] == "Offensive Line") ufr_oline <- tmp
+      if(tmp[1,1] == "Backs") one_table <- FALSE
     }
     
-    tmp           <- ufr_oline[4:nrow(ufr_oline),1:5]
-    tmp[,2:5]     <- sapply(tmp[,2:5],as.numeric)
-    tmp[,2:5]     <- sapply(tmp[,2:5],function(x){x[is.na(x)] <- 0;return(x)})
-    tmp$position  <- o_position[1]
-    tmp$opponent  <- opp
-    tmp$year      <- year
-    tmp$snaps     <- tmp[, 2]
-    tmp           <- tmp[,-2]
-    new_inds      <- (nrow(ufr_O_db)+1):(nrow(ufr_O_db)+nrow(tmp))
-    rownames(tmp) <- new_inds
-    
-    ufr_O_db[new_inds,] <- tmp
-    
-    # Extract Backs and Receivers Data
-    for (ii in 2:length(ufr_tables)){
-      tmp <- ufr_tables[[ii]] %>% 
-        html_table(fill=TRUE,header=FALSE)
-      if(tmp[1,1] == "Backs") ufr_oline <- tmp
-    }
-    
-    ref_inds <- c(which(ufr_oline[,1]=="Backs"),
-                  which(ufr_oline[,1]=="Receivers" | ufr_oline[,1]=="Receiver"),
-                  nrow(ufr_oline)+1)
-    
-    
-    # Extract data from chart for each position group
-    for (ii in 1:2){
-      tmp           <- ufr_oline[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:5]
+    if (one_table){
+      ref_inds <- c(which(ufr_oline[,1]=="OL" | ufr_oline[,1]=="Offensive Line"),
+                    which(ufr_oline[,1]=="RB" | ufr_oline[,1]=="Backs"),
+                    which(ufr_oline[,1]=="WR" | ufr_oline[,1]=="Receivers" | ufr_oline[,1]=="Receiver"),
+                    which(ufr_oline[,1]=="Metrics"))
+      
+      for (ii in 1:3){
+        tmp           <- ufr_oline[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:4]
+        tmp[,2:4]     <- sapply(tmp[,2:4],as.numeric)
+        tmp[,2:4]     <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
+        tmp$position  <- o_position[ii]
+        tmp$opponent  <- opp
+        tmp$year      <- year
+        tmp$snaps     <- NA
+        #tmp           <- tmp[,-2]
+        new_inds      <- (nrow(ufr_O_db)+1):(nrow(ufr_O_db)+nrow(tmp))
+        rownames(tmp) <- new_inds
+        
+        ufr_O_db[new_inds,] <- tmp
+      }
+      
+      # and extract data for Team Metrics
+      tmp           <- ufr_oline[(ref_inds[4]+2):nrow(ufr_oline),1:4]
+      tmp[,2:4]     <- sapply(tmp[,2:4],as.numeric)
+      tmp[,2:4]     <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
+      tmp$position  <- o_position[4]
+      tmp$opponent  <- opp
+      tmp$year      <- year
+      tmp$snaps     <- NA
+      new_inds      <- (nrow(ufr_O_db)+1):(nrow(ufr_O_db)+nrow(tmp))
+      rownames(tmp) <- new_inds
+      
+      ufr_O_db[new_inds,] <- tmp
+      
+    }else{
+      tmp           <- ufr_oline[4:nrow(ufr_oline),1:5]
       tmp[,2:5]     <- sapply(tmp[,2:5],as.numeric)
       tmp[,2:5]     <- sapply(tmp[,2:5],function(x){x[is.na(x)] <- 0;return(x)})
-      tmp$position  <- o_position[ii+1]
+      tmp$position  <- o_position[1]
       tmp$opponent  <- opp
       tmp$year      <- year
       tmp$snaps     <- tmp[, 2]
@@ -139,27 +151,54 @@ for (i in (1:length(new_links))) {
       rownames(tmp) <- new_inds
       
       ufr_O_db[new_inds,] <- tmp
+      
+      # Extract Backs and Receivers Data
+      for (ii in 2:length(ufr_tables)){
+        tmp <- ufr_tables[[ii]] %>% 
+          html_table(fill=TRUE,header=FALSE)
+        if(tmp[1,1] == "Backs") ufr_oline <- tmp
+      }
+      
+      ref_inds <- c(which(ufr_oline[,1]=="Backs"),
+                    which(ufr_oline[,1]=="Receivers" | ufr_oline[,1]=="Receiver"),
+                    nrow(ufr_oline)+1)
+      
+      
+      # Extract data from chart for each position group
+      for (ii in 1:2){
+        tmp           <- ufr_oline[(ref_inds[ii]+2):(ref_inds[ii+1]-1),1:5]
+        tmp[,2:5]     <- sapply(tmp[,2:5],as.numeric)
+        tmp[,2:5]     <- sapply(tmp[,2:5],function(x){x[is.na(x)] <- 0;return(x)})
+        tmp$position  <- o_position[ii+1]
+        tmp$opponent  <- opp
+        tmp$year      <- year
+        tmp$snaps     <- tmp[, 2]
+        tmp           <- tmp[,-2]
+        new_inds      <- (nrow(ufr_O_db)+1):(nrow(ufr_O_db)+nrow(tmp))
+        rownames(tmp) <- new_inds
+        
+        ufr_O_db[new_inds,] <- tmp
+      }
+      
+      # and for team metrics
+      for (ii in 2:length(ufr_tables)){
+        tmp <- ufr_tables[[ii]] %>% 
+          html_table(fill=TRUE,header=FALSE)
+        if(tmp[1,1] == "Metrics") ufr_oline <- tmp
+      }
+      
+      tmp           <- ufr_oline[3:4,1:4]
+      tmp[,2:4]     <- sapply(tmp[,2:4],as.numeric)
+      tmp[,2:4]     <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
+      tmp$position  <- o_position[4]
+      tmp$opponent  <- opp
+      tmp$year      <- year
+      tmp$snaps     <- NA
+      new_inds      <- (nrow(ufr_O_db)+1):(nrow(ufr_O_db)+nrow(tmp))
+      rownames(tmp) <- new_inds
+      
+      ufr_O_db[new_inds,] <- tmp
     }
-    
-    # and for team metrics
-    for (ii in 2:length(ufr_tables)){
-      tmp <- ufr_tables[[ii]] %>% 
-        html_table(fill=TRUE,header=FALSE)
-      if(tmp[1,1] == "Metrics") ufr_oline <- tmp
-    }
-    
-    tmp           <- ufr_oline[3:4,1:4]
-    tmp[,2:4]     <- sapply(tmp[,2:4],as.numeric)
-    tmp[,2:4]     <- sapply(tmp[,2:4],function(x){x[is.na(x)] <- 0;return(x)})
-    tmp$position  <- o_position[4]
-    tmp$opponent  <- opp
-    tmp$year      <- year
-    tmp$snaps     <- NA
-    new_inds      <- (nrow(ufr_O_db)+1):(nrow(ufr_O_db)+nrow(tmp))
-    rownames(tmp) <- new_inds
-    
-    ufr_O_db[new_inds,] <- tmp
-    
   }
   
 }
@@ -172,7 +211,13 @@ ufr_O_db$opponent[ufr_O_db$opponent=="michigan-state"] <- "msu"
 ufr_D_db$opponent[ufr_D_db$opponent=="michigan-state"] <- "msu"
 
 # Fix names or inconsistent name conventions
-ufr_D_db$name[ufr_D_db$name=="Hill" & ufr_D_db$year < 2016] <- "D. Hill"
+ufr_D_db$name[ufr_D_db$name=="Glasgow" & ufr_D_db$year < 2017]  <- "R. Glasgow"
+ufr_D_db$name[ufr_D_db$name=="Glasgow" & ufr_D_db$year >= 2017] <- "J. Glasgow"
+ufr_D_db$name[ufr_D_db$name=="Jones" & ufr_D_db$year >= 2017] <- "R. Jones"
+ufr_D_db$name[ufr_D_db$name=="Hill" & ufr_D_db$year < 2016]   <- "D. Hill"
+ufr_D_db$name[ufr_D_db$name=="Hill" & ufr_D_db$year >= 2017]  <- "L. Hill"
+ufr_D_db$name[ufr_D_db$name=="Thomas" & ufr_D_db$year >= 2017]  <- "Am. Thomas"
+ufr_O_db$name[ufr_O_db$name=="Hill" & ufr_O_db$year >= 2016]   <- "K. Hill"
 ufr_D_db$name[ufr_D_db$name=="C.Gordon"] <- "C. Gordon"
 ufr_D_db$name[ufr_D_db$name=="Holowell"] <- "Hollowell"
 ufr_D_db$name[ufr_D_db$name=="VanBergen"] <- "Van Bergen"

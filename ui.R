@@ -134,7 +134,7 @@ shinyUI(fluidPage(
                                      column(3,
                                             flowLayout(
                                               selectInput("d_pname_dl","Player",
-                                                          sort(unique(subset(ufr_D_db,position == "DL" & name != "TOTAL")$name)),selected="Glasgow"),
+                                                          sort(unique(subset(ufr_D_db,position == "DL" & name != "TOTAL")$name)),selected="R. Glasgow"),
                                               br(),
                                               checkboxInput("d_agg_player_dl","Aggregate By Year?")
                                             )
@@ -179,7 +179,7 @@ shinyUI(fluidPage(
                             selectInput("d_pname1","Player 1",
                                         sort(unique(ufr_D_db$name)),selected = "B. Graham"),
                             selectInput("d_pname2","Player 2",
-                                        sort(unique(ufr_D_db$name)),selected = "Glasgow"),
+                                        sort(unique(ufr_D_db$name)),selected = "R. Glasgow"),
                             checkboxInput("d_agg_players","Aggregate By Year?")
                           )
                           
