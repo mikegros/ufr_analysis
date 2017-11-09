@@ -134,7 +134,7 @@ shinyUI(fluidPage(
                                      column(3,
                                             flowLayout(
                                               selectInput("d_pname_dl","Player",
-                                                          sort(unique(subset(ufr_D_db,position == "DL" & name != "TOTAL")$name)),selected="R. Glasgow"),
+                                                          sort(unique(subset(ufr_D_db,position == "DL" & name != "TOTAL")$name)),selected="Hurst"),
                                               br(),
                                               checkboxInput("d_agg_player_dl","Aggregate By Year?")
                                             )
@@ -144,7 +144,7 @@ shinyUI(fluidPage(
                                      column(3,
                                             flowLayout(
                                               selectInput("d_pname_lb","Player",
-                                                          sort(unique(subset(ufr_D_db,position == "LB" & name != "TOTAL")$name)),selected="Morgan"),
+                                                          sort(unique(subset(ufr_D_db,position == "LB" & name != "TOTAL")$name)),selected="Bush"),
                                               br(),
                                               checkboxInput("d_agg_player_lb","Aggregate By Year?")
                                             )
@@ -177,9 +177,9 @@ shinyUI(fluidPage(
                  tabPanel("Compare Players", value = "two_players",
                           flowLayout(
                             selectInput("d_pname1","Player 1",
-                                        sort(unique(ufr_D_db$name)),selected = "B. Graham"),
+                                        sort(unique(ufr_D_db$name)),selected = "Martin"),
                             selectInput("d_pname2","Player 2",
-                                        sort(unique(ufr_D_db$name)),selected = "R. Glasgow"),
+                                        sort(unique(ufr_D_db$name)),selected = "Hurst"),
                             checkboxInput("d_agg_players","Aggregate By Year?")
                           )
                           
